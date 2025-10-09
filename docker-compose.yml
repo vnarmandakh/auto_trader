@@ -4,19 +4,16 @@ services:
     env_file: .env
     ports: ["8000:8000"]
     depends_on: [db, redis]
-    volumes: [".:/app"]
   worker:
     build: .
     command: celery -A arbmon worker -l info
     env_file: .env
     depends_on: [db, redis]
-    volumes: [".:/app"]
   beat:
     build: .
     command: celery -A arbmon beat -l info
     env_file: .env
     depends_on: [db, redis]
-    volumes: [".:/app"]
   db:
     image: postgres:15
     environment:
