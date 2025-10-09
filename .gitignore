@@ -1,0 +1,111 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+Pipfile.lock
+poetry.lock
+
+# Byte-compiled / optimized / DLL files
+*.so
+*.dll
+*.dylib
+*.pyd
+
+# Unit test / coverage reports
+.coverage
+htmlcov/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+
+# === Django ===
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+static/
+build/
+migrations/__pycache__/
+*/migrations/__pycache__/
+*.pot
+*.mo
+
+# Django secret key or local env vars
+.env
+.env.*
+*.local
+secrets.json
+
+# === Logs ===
+*.log
+logs/
+celerybeat-schedule
+celerybeat.pid
+
+# === IDE / Editor ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+*.tmp
+*.DS_Store
+Thumbs.db
+
+# === OS ===
+.DS_Store
+ehthumbs.db
+Icon?
+desktop.ini
+
+# === Docker ===
+# Local volumes & temp build layers
+pgdata/
+redisdata/
+__docker_cache__/
+.docker/
+.dockerignore
+
+# === Node / Frontend (if added later) ===
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+
+# === Celery / Channels Runtime Files ===
+celerybeat-schedule.db
+celerybeat-schedule
+celerybeat.pid
+*.pid
+*.sock
+*.log
+
+# === Database Dumps / Backups ===
+*.sql
+*.dump
+*.bak
+*.backup
+
+# === Compiled assets ===
+*.map
+*.min.js
+*.min.css
+
+# === Temporary files ===
+tmp/
+temp/
+.cache/
+__pypackages__/
+.cache-loader/
+.pytest_cache/
+pytest_cache/
