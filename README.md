@@ -34,6 +34,13 @@ development but **will fail fast** if critical secrets are absent.
 | `DATA_RETENTION_PRUNE_INTERVAL` | Frequency (seconds) of the pruning task. |
 | `WEBSOCKET_MAX_CONNECTIONS_PER_USER`, `WEBSOCKET_CONNECTION_WINDOW_SEC` | Authenticated WebSocket rate-limiting knobs. |
 | `DJANGO_USE_SQLITE` | Set to `1` during local development/tests to use SQLite instead of PostgreSQL. |
+| `BINANCE_API_KEY`, `BINANCE_API_SECRET` | Credentials for authenticated Binance trading endpoints. |
+| `TRADEMN_API_KEY`, `TRADEMN_API_SECRET` | Credentials for authenticated TradeMN trading endpoints. |
+| `ARBITRAGE_DEPOSIT_ADDRESSES` | JSON mapping of deposit addresses per exchange and network (e.g. `{ "binance": { "USDT:TRX": "T123" } }`). |
+| `ARBITRAGE_EXECUTION_INTERVAL_SEC` | Cadence (seconds) for the automated execution task. |
+| `ARBITRAGE_BRIDGE_NETWORK` | Network identifier for cross-exchange withdrawals (default `TRX`). |
+| `ARBITRAGE_QUOTE_TRANSFER_FEE`, `ARBITRAGE_BASE_TRANSFER_FEE` | Estimated network withdrawal fees for quote/base assets. |
+| `ARBITRAGE_MIN_QUANTITY`, `ARBITRAGE_SLIPPAGE_BUFFER` | Sizing and slippage assumptions for executed orders. |
 
 Optional knobs allow fine tuning of API pagination (`API_PAGE_SIZE`), rate
 limits (`API_USER_THROTTLE`, `API_ANON_THROTTLE`, `API_TRADES_THROTTLE`), and
@@ -108,6 +115,9 @@ credentials are supplied through `.env`.
 - `arbitrage.tasks.scan_spreads` analyzes the latest ticker snapshots and
   emits WebSocket alerts only when net spreads exceed
   `ARBITRAGE_MIN_NET_SPREAD`.
+- `trades.tasks.execute_arbitrage` turns high-confidence spreads into live
+  trades, handling TradeMN↔Binance transfers over the configured Tron network
+  and rebalancing quote assets for continuous 24/7 cycling.
 - `datafeed.tasks.prune_timeseries` periodically deletes historical ticker,
   arbitrage, and trade rows older than `DATA_RETENTION_DAYS` to keep the
   database lean.

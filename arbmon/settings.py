@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 
@@ -21,6 +22,14 @@ def _require_setting(name: str) -> str:
     if not value:
         raise ImproperlyConfigured(f"Missing required setting: {name}")
     return value
+
+
+def _json_setting(name: str, default: str = "{}") -> dict:
+    raw = os.getenv(name, default)
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise ImproperlyConfigured(f"Invalid JSON for {name}") from exc
 
 
 SECRET_KEY = _require_setting("DJANGO_SECRET_KEY")
@@ -170,6 +179,32 @@ TRADEMN_PRICE_INDEX_ASK = int(os.getenv("TRADEMN_PRICE_INDEX_ASK", "0"))
 TRADEMN_PRICE_INDEX_BID = int(os.getenv("TRADEMN_PRICE_INDEX_BID", "0"))
 TRADEMN_QTY_INDEX = int(os.getenv("TRADEMN_QTY_INDEX", "1"))
 
+BINANCE_API_BASE_URL = os.getenv("BINANCE_API_BASE_URL", "https://api.binance.com")
+BINANCE_API_KEY = os.getenv("BINANCE_API_KEY")
+BINANCE_API_SECRET = os.getenv("BINANCE_API_SECRET")
+TRADEMN_API_BASE_URL = os.getenv("TRADEMN_API_BASE_URL", "https://trade.mn")
+TRADEMN_API_ORDER_PATH = os.getenv("TRADEMN_API_ORDER_PATH", "/api/v1/orders")
+TRADEMN_API_BALANCE_PATH = os.getenv("TRADEMN_API_BALANCE_PATH", "/api/v1/account/balances")
+TRADEMN_API_WITHDRAW_PATH = os.getenv("TRADEMN_API_WITHDRAW_PATH", "/api/v1/wallet/withdraw")
+TRADEMN_API_DEPOSIT_PATH = os.getenv("TRADEMN_API_DEPOSIT_PATH", "/api/v1/wallet/deposit_address")
+TRADEMN_API_KEY = os.getenv("TRADEMN_API_KEY")
+TRADEMN_API_SECRET = os.getenv("TRADEMN_API_SECRET")
+
+ARBITRAGE_MIN_QUANTITY = float(os.getenv("ARBITRAGE_MIN_QUANTITY", "0.0001"))
+ARBITRAGE_SLIPPAGE_BUFFER = float(os.getenv("ARBITRAGE_SLIPPAGE_BUFFER", "0.001"))
+ARBITRAGE_BRIDGE_NETWORK = os.getenv("ARBITRAGE_BRIDGE_NETWORK", "TRX")
+ARBITRAGE_BASE_TRANSFER_FEE = float(os.getenv("ARBITRAGE_BASE_TRANSFER_FEE", "0"))
+ARBITRAGE_QUOTE_TRANSFER_FEE = float(os.getenv("ARBITRAGE_QUOTE_TRANSFER_FEE", "1"))
+ARBITRAGE_TRANSFER_TIMEOUT = float(os.getenv("ARBITRAGE_TRANSFER_TIMEOUT", "600"))
+ARBITRAGE_TRANSFER_POLL_INTERVAL = float(
+    os.getenv("ARBITRAGE_TRANSFER_POLL_INTERVAL", "5")
+)
+ARBITRAGE_REBALANCE_QUOTE = os.getenv("ARBITRAGE_REBALANCE_QUOTE", "1") == "1"
+ARBITRAGE_DEPOSIT_ADDRESSES = _json_setting("ARBITRAGE_DEPOSIT_ADDRESSES", "{}")
+ARBITRAGE_EXECUTION_INTERVAL_SEC = float(
+    os.getenv("ARBITRAGE_EXECUTION_INTERVAL_SEC", str(max(SCAN_INTERVAL_SEC, 10)))
+)
+
 DATA_RETENTION_DAYS = float(os.getenv("DATA_RETENTION_DAYS", "7"))
 DATA_RETENTION_PRUNE_INTERVAL = int(
     os.getenv("DATA_RETENTION_PRUNE_INTERVAL", "3600")
@@ -196,6 +231,11 @@ CELERY_BEAT_SCHEDULE = {
         "task": "arbitrage.tasks.scan_spreads",
         "schedule": SCAN_INTERVAL_SEC,
         "options": {"expires": SCAN_INTERVAL_SEC},
+    },
+    "execute-arbitrage": {
+        "task": "trades.tasks.execute_arbitrage",
+        "schedule": ARBITRAGE_EXECUTION_INTERVAL_SEC,
+        "options": {"expires": ARBITRAGE_EXECUTION_INTERVAL_SEC},
     },
     "prune-stale-data": {
         "task": "datafeed.tasks.prune_timeseries",
